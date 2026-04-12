@@ -26,13 +26,19 @@ feImage (displacement map)
 
 The only DOM overhead is one hidden `<svg>` per glass element.
 
+## Browser support
+
+The effect depends on SVG filters as `backdrop-filter`, which is currently **Chrome-only**. Firefox and Safari do not support this CSS feature.
+
+The project works inside Chromium-based runtimes (Electron, etc.). In other browsers the glass layer renders invisibly — there is no fallback yet.
+
 ## Surface profiles
 
 | Surface | Description |
 |---------|-------------|
 | `squircle` | Superellipse curve — the default, smooth and modern |
 | `circle` | Standard circular curvature |
-| `concave` | Inverted curvature, bends light inward |
+| `concave` | Bowl-shaped inversion — rays diverge outward, sampling content beyond the element edges |
 | `lens` | Radial magnifying lens — smooth sine/cosine profile from centre to rim, no seam |
 
 ## Project structure
@@ -77,7 +83,7 @@ import { LiquidGlass } from './components/liquidGlass';
   thickness={80}       // overall refraction strength
   borderRadius={32}    // CSS border-radius
   blurAmount={10}      // backdrop blur before refraction (px); use 0 for lens
-  refractionLevel={1}  // multiplier on the displacement scale
+  refractionLevel={1}  // multiplier on displacement scale — safe to animate, no map rebuild
   specular             // show specular edge highlight (default true)
 >
   {/* children render above the glass layer */}
