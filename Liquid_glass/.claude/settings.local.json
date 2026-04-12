@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -s \"https://kube.io/blog/liquid-glass-css-svg/\")"
-    ]
-  }
-}
