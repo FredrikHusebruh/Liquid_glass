@@ -5,3 +5,83 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ── Glass range slider ─────────────────────────────────────── */
+.glass-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Track — WebKit */
+.glass-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Thumb — WebKit */
+.glass-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-top: -7px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.50),
+    0 2px 8px rgba(0, 0, 0, 0.30),
+    0 0 12px rgba(255, 255, 255, 0.40);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.glass-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.70),
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(255, 255, 255, 0.55);
+}
+
+.glass-slider:active::-webkit-slider-thumb {
+  transform: scale(1.05);
+}
+
+/* Track — Firefox */
+.glass-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.22);
+}
+
+/* Thumb — Firefox */
+.glass-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.50),
+    0 2px 8px rgba(0, 0, 0, 0.30),
+    0 0 12px rgba(255, 255, 255, 0.40);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.glass-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}

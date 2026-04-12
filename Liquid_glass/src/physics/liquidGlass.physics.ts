@@ -1,4 +1,5 @@
 const N1 = 1.0, N2 = 1.5, SAMPLES = 128;
+const LENS_BODY_MAG = 0.7; // peak inward displacement magnitude for the lens
 
 function makeCanvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D, ImageData] {
   const canvas = document.createElement('canvas');
@@ -118,6 +119,8 @@ export function generateLensMap(
   const cx = w / 2, cy = h / 2;
   const R = Math.min(w, h) / 2;
 
+  const innerR = Math.max(0, R - bezel);
+
   for (let py = 0; py < h; py++) {
     for (let px = 0; px < w; px++) {
       const dx = px - cx, dy = py - cy;
@@ -128,9 +131,16 @@ export function generateLensMap(
         data[i] = data[i + 1] = data[i + 2] = 128; data[i + 3] = 255; continue;
       }
 
-      const t = r / R;
-      const mag = Math.sin(t * Math.PI / 2) * 0.7;
       const nx = dx / r, ny = dy / r;
+      let mag: number;
+
+      if (r <= innerR) {
+        mag = Math.sin((r / innerR) * Math.PI / 2) * LENS_BODY_MAG;
+      } else {
+        // cos gives slope=0 at innerR, matching the sin peak — no kink
+        const bt = (r - innerR) / Math.max(1, bezel);
+        mag = Math.cos(bt * Math.PI / 2) * LENS_BODY_MAG;
+      }
 
       data[i]     = Math.round(128 - nx * mag * 127);
       data[i + 1] = Math.round(128 - ny * mag * 127);

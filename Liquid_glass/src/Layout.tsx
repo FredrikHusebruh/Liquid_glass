@@ -2,34 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ImageProvider, useImage } from './ImageContext';
 import { LiquidGlass } from './components/liquidGlass';
+import { NavBtn } from './components/NavBtn';
 import { IMAGES } from './imageStore';
-
-const BTN = 36;
-
-function NavBtn({ onClick, style, label, children }: {
-  onClick: () => void;
-  style?: React.CSSProperties;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', ...style }}
-    >
-      <LiquidGlass width={BTN} height={BTN} surface="squircle" bezel={8} thickness={40} borderRadius={10} blurAmount={5}>
-        {children}
-      </LiquidGlass>
-    </button>
-  );
-}
 
 function LayoutInner() {
   const { activeId, setActiveId, activeSrc } = useImage();
   const navRef = useRef<HTMLDivElement>(null);
   const [navSize, setNavSize] = useState({ width: 0, height: 0 });
-  const [navOpen, setNavOpen] = useState(true);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     if (!navRef.current) return;
@@ -70,7 +50,7 @@ function LayoutInner() {
               bezel={25}
               thickness={100}
               borderRadius={32}
-              blurAmount={3}
+              blurAmount={0}
             />
           </div>
         )}

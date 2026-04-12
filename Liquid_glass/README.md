@@ -1,73 +1,94 @@
-# React + TypeScript + Vite
+# Liquid Glass
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A physically-based liquid glass morphism effect for React. Refraction is computed using Snell's Law and rendered entirely through SVG displacement maps — no WebGL or animation loops required.
 
-Currently, two official plugins are available:
+## How it works
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The effect runs in two stages:
 
-## React Compiler
+**1. Physics (CPU, one-time per config)**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+A Canvas 2D pass generates two maps whenever the component config changes:
 
-## Expanding the ESLint configuration
+- **Displacement map** — each pixel's RG channels encode the X/Y refraction offset at that point. Computed by tracing rays through the glass surface using Snell's Law (N1 = 1.0 air, N2 = 1.5 glass) across a 128-sample lookup table.
+- **Specular map** — a white-on-transparent overlay that adds the lit edge highlight, computed from the surface normal dotted against a fixed light direction.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**2. Rendering (GPU, CSS)**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The maps are fed into an SVG `<filter>` applied via `backdrop-filter`:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+feImage (displacement map)
+  → feGaussianBlur       (softens edges)
+    → feDisplacementMap  (warps the backdrop)
+      → feBlend          (screen-blends the specular highlight on top)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The only DOM overhead is one hidden `<svg>` per glass element.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Surface profiles
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Surface | Description |
+|---------|-------------|
+| `squircle` | Superellipse curve — the default, smooth and modern |
+| `circle` | Standard circular curvature |
+| `concave` | Inverted curvature, bends light inward |
+| `lens` | Radial magnifying lens — smooth sine/cosine profile from centre to rim, no seam |
+
+## Project structure
+
 ```
+src/
+├── components/
+│   ├── liquidGlass.tsx          # Main component — SVG filter + styled div
+│   ├── DraggableGlass.tsx       # Pointer-draggable wrapper around LiquidGlass
+│   ├── LensControls.tsx         # Toggleable right-side panel: surface selector, displacement map preview, sliders
+│   └── NavBtn.tsx               # Shared glass pill button used by nav and controls panels
+├── hooks/
+│   ├── useLiquidGlass.ts        # Generates displacement + specular maps, memoised by config
+│   └── useDrag.ts               # Pointer capture drag hook
+├── physics/
+│   └── liquidGlass.physics.ts   # Snell's Law ray tracer, SDF maths, canvas map generators
+├── types/
+│   └── liquidGlass.types.ts     # Shared TypeScript interfaces
+├── Layout.tsx                   # App shell: collapsible image-selector nav + background
+├── ImageContext.tsx              # React context for the active background image
+├── imageStore.ts                # Static image list
+└── App.tsx                      # Demo: draggable lens + LensControls panel
+```
+
+## Getting started
+
+```bash
+npm install
+npm run dev
+```
+
+## LiquidGlass component
+
+```tsx
+import { LiquidGlass } from './components/liquidGlass';
+
+<LiquidGlass
+  width={300}
+  height={200}
+  surface="squircle"   // 'squircle' | 'circle' | 'concave' | 'lens'
+  bezel={25}           // rim width in px — affects refraction profile and specular
+  thickness={80}       // overall refraction strength
+  borderRadius={32}    // CSS border-radius
+  blurAmount={10}      // backdrop blur before refraction (px); use 0 for lens
+  refractionLevel={1}  // multiplier on the displacement scale
+  specular             // show specular edge highlight (default true)
+>
+  {/* children render above the glass layer */}
+</LiquidGlass>
+```
+
+## Tech stack
+
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS 4
+- React Router 7
+- Canvas 2D API (map generation)
+- SVG filters (rendering)

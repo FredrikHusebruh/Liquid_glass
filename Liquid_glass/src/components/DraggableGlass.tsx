@@ -18,8 +18,9 @@ export function DraggableGlass({ initialX, initialY, children, ...glassProps }: 
     <div
       style={{
         position: 'absolute',
-        left: position.x,
-        top: position.y,
+        left: '50%',
+        top: '50%',
+        transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
         userSelect: 'none',
         touchAction: 'none',
         ...dragHandleProps.style,
