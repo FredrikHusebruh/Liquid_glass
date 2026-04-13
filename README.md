@@ -1,6 +1,15 @@
 # Liquid Glass
 
-A physically-based liquid glass morphism effect for React. Refraction is computed using Snell's Law and rendered entirely through SVG displacement maps — no WebGL or animation loops required.
+Ever since IOS 26 came out i have been facinated by the liquid glass effect. In previous projects i have attempted to replicate this effect with simple blurs and and low opacity backgrounds. How ever the result never came out right. After comming across this [article](https://kube.io/blog/liquid-glass-css-svg/), I felt inspired to give this one more shot, creating physics-based liquid glass effect for React. Refraction is computed using Snell's Law and rendered entirely through SVG displacement maps, no WebGL or animation loops required.
+
+![liquidglass-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/0ce4a08e-7444-416b-a641-2f1850666205)
+
+## Getting started
+
+```bash
+npm install
+npm run dev
+```
 
 ## How it works
 
@@ -61,33 +70,6 @@ src/
 ├── ImageContext.tsx              # React context for the active background image
 ├── imageStore.ts                # Static image list
 └── App.tsx                      # Demo: draggable lens + LensControls panel
-```
-
-## Getting started
-
-```bash
-npm install
-npm run dev
-```
-
-## LiquidGlass component
-
-```tsx
-import { LiquidGlass } from './components/liquidGlass';
-
-<LiquidGlass
-  width={300}
-  height={200}
-  surface="squircle"   // 'squircle' | 'circle' | 'concave' | 'lens'
-  bezel={25}           // rim width in px — affects refraction profile and specular
-  thickness={80}       // overall refraction strength
-  borderRadius={32}    // CSS border-radius
-  blurAmount={10}      // backdrop blur before refraction (px); use 0 for lens
-  refractionLevel={1}  // multiplier on displacement scale — safe to animate, no map rebuild
-  specular             // show specular edge highlight (default true)
->
-  {/* children render above the glass layer */}
-</LiquidGlass>
 ```
 
 ## Tech stack
